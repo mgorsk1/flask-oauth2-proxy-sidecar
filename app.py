@@ -1,3 +1,4 @@
+import jwt
 from flask import Flask
 from flask import request
 
@@ -6,10 +7,14 @@ app = Flask(__name__)
 
 @app.route('/')
 def hello_world():
-    email = request.headers.get('X_FORWARDED_EMAIL')
-    username = request.headers.get('X_FORWARDED_PREFERRED_USERNAME')
+    _token = request.headers.get('X_FORWARDED_ACCESS_TOKEN')
 
-    return f'Hello World {username} {email}!'
+    data = jwt.decode(_token, algorithms=['RS256'], options={"verify_signature": False})
+
+    email = data.get('email')
+    username = data.get('name')
+
+    return f'Hello {username} ({email})!'
 
 
 if __name__ == '__main__':
